@@ -65,6 +65,11 @@ chatgpt:
   version: GPT35
   context:
     length: 4
+  prompt:
+    # v1=chat2db 2023.06
+    # v2=chat2db 2023.07.08
+    # v3=show create table ddl
+    version: v3
 
 # Print the HTTP log
 logbook:

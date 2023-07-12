@@ -13,6 +13,7 @@ import ai.chat2db.server.domain.api.enums.AiSqlSourceEnum;
 import ai.chat2db.server.domain.api.model.Config;
 import ai.chat2db.server.domain.api.model.DataSource;
 import ai.chat2db.server.domain.api.param.TableQueryParam;
+import ai.chat2db.server.domain.api.param.ShowCreateTableParam;
 import ai.chat2db.server.domain.api.service.ConfigService;
 import ai.chat2db.server.domain.api.service.DataSourceService;
 import ai.chat2db.server.domain.api.service.TableService;
@@ -86,6 +87,9 @@ public class ChatController {
 
     @Value("${chatgpt.version}")
     private String gptVersion;
+
+    @Value("${chatgpt.prompt.version}")
+    private String promptVersion;
 
     /**
      * chat的超时时间
@@ -290,7 +294,7 @@ public class ChatController {
      */
     private SseEmitter chatWithOpenAiSql(ChatQueryRequest queryRequest, SseEmitter sseEmitter, String uid)
         throws IOException {
-        String prompt = buildPrompt(queryRequest);
+        String prompt = buildPrompt(queryRequest, promptVersion);
         if (prompt.length() / TOKEN_CONVERT_CHAR_LENGTH > MAX_PROMPT_LENGTH) {
             log.error("提示语超出最大长度:{}，输入长度:{}, 请重新输入", MAX_PROMPT_LENGTH,
                 prompt.length() / TOKEN_CONVERT_CHAR_LENGTH);
@@ -351,7 +355,7 @@ public class ChatController {
      * @throws IOException
      */
     private SseEmitter chatWithAzureAi(ChatQueryRequest queryRequest, SseEmitter sseEmitter, String uid) throws IOException {
-        String prompt = buildPrompt(queryRequest);
+        String prompt = buildPrompt(queryRequest, promptVersion);
         if (prompt.length() / TOKEN_CONVERT_CHAR_LENGTH > MAX_PROMPT_LENGTH) {
             log.error("提示语超出最大长度:{}，输入长度:{}, 请重新输入", MAX_PROMPT_LENGTH,
                     prompt.length() / TOKEN_CONVERT_CHAR_LENGTH);
@@ -522,6 +526,171 @@ public class ChatController {
         //if (I18nUtils.isEn()) {
         //    schemaProperty = String.format("%s\n#\n### 返回结果要求为英文", schemaProperty);
         //}
+        return schemaProperty;
+    }
+
+    /**
+     * 构建prompt-支持各种版本
+     *
+     * @param queryRequest
+     * @param version
+     * @return
+     */
+    private String buildPrompt(ChatQueryRequest queryRequest, String version) {
+        if (version.equals("v1")) {
+            return buildPromptV1(queryRequest);
+        } else if (version.equals("v2")) {
+            return buildPromptV2(queryRequest);
+        } else if (version.equals("v3")) {
+            return buildPromptV3(queryRequest);
+        } else {
+            return buildPrompt(queryRequest);
+        }
+    }
+
+    /**
+     * 构建prompt v1: Chat2DB 2023.06 版本 prompt
+     *
+     * @param queryRequest
+     * @return
+     */
+    private String buildPromptV1(ChatQueryRequest queryRequest) {
+        // 查询schema信息
+        DataResult<DataSource> dataResult = dataSourceService.queryById(queryRequest.getDataSourceId());
+        String dataSourceType = dataResult.getData().getType();
+        if (StringUtils.isBlank(dataSourceType)) {
+            dataSourceType = "MYSQL";
+        }
+        TableQueryParam queryParam = chatConverter.chat2tableQuery(queryRequest);
+        Map<String, List<TableColumn>> tableColumns = buildTableColumn(queryParam, queryRequest.getTableNames());
+        List<String> tableSchemas = tableColumns.entrySet().stream().map(
+                entry -> String.format("%s(%s)", entry.getKey(),
+                        entry.getValue().stream().map(TableColumn::getName).collect(
+                                Collectors.joining(", ")))).collect(Collectors.toList());
+        String properties = String.join("\n#", tableSchemas);
+        String prompt = queryRequest.getMessage();
+        String promptType = StringUtils.isBlank(queryRequest.getPromptType()) ? PromptType.NL_2_SQL.getCode()
+                : queryRequest.getPromptType();
+        PromptType pType = EasyEnumUtils.getEnum(PromptType.class, promptType);
+        String ext = StringUtils.isNotBlank(queryRequest.getExt()) ? queryRequest.getExt() : "";
+        String schemaProperty = CollectionUtils.isNotEmpty(tableSchemas) ? String.format(
+                "### 请根据以下table properties和SQL input%s. %s\n#\n### %s SQL tables, with their properties:\n#\n# "
+                        + "%s\n#\n#\n### SQL input: %s", pType.getDescription(), ext, dataSourceType,
+                properties, prompt) : String.format("### 请根据以下SQL input%s. %s\n#\n### SQL input: %s",
+                pType.getDescription(), ext, prompt);
+        switch (pType) {
+            case SQL_2_SQL:
+                schemaProperty = StringUtils.isNotBlank(queryRequest.getDestSqlType()) ? String.format(
+                        "%s\n#\n### 目标SQL类型: %s", schemaProperty, queryRequest.getDestSqlType()) : String.format(
+                        "%s\n#\n### 目标SQL类型: %s", schemaProperty, dataSourceType);
+            default:
+                break;
+        }
+        //if (I18nUtils.isEn()) {
+        //    schemaProperty = String.format("%s\n#\n### 返回结果要求为英文", schemaProperty);
+        //}
+        return String.format("%s. \n要求返回Markdown格式", schemaProperty);
+    }
+
+    /**
+     * 构建prompt v1: Chat2DB 2023.07.08 版本 prompt
+     *
+     * @param queryRequest
+     * @return
+     */
+    private String buildPromptV2(ChatQueryRequest queryRequest) {
+        // 查询schema信息
+        DataResult<DataSource> dataResult = dataSourceService.queryById(queryRequest.getDataSourceId());
+        String dataSourceType = dataResult.getData().getType();
+        if (StringUtils.isBlank(dataSourceType)) {
+            dataSourceType = "MYSQL";
+        }
+        TableQueryParam queryParam = chatConverter.chat2tableQuery(queryRequest);
+        Map<String, List<TableColumn>> tableColumns = buildTableColumn(queryParam, queryRequest.getTableNames());
+        List<String> tableSchemas = tableColumns.entrySet().stream().map(
+                entry -> String.format("%s(%s)", entry.getKey(),
+                        entry.getValue().stream().map(TableColumn::getName).collect(
+                                Collectors.joining(", ")))).collect(Collectors.toList());
+        String properties = String.join("\n#", tableSchemas);
+        String prompt = queryRequest.getMessage();
+        String promptType = StringUtils.isBlank(queryRequest.getPromptType()) ? PromptType.NL_2_SQL.getCode()
+                : queryRequest.getPromptType();
+        PromptType pType = EasyEnumUtils.getEnum(PromptType.class, promptType);
+        String ext = StringUtils.isNotBlank(queryRequest.getExt()) ? queryRequest.getExt() : "";
+        String result = "假设你是个SQL编辑器，接下来你返回的SQL代码要和其他内容分隔，非SQL代码内容的每一行前面追加-- \n";
+        String schemaProperty = CollectionUtils.isNotEmpty(tableSchemas) ? String.format(
+                "%s### 请根据以下table properties和SQL input%s. %s\n#\n### %s SQL tables, with their properties:\n#\n# "
+                        + "%s\n#\n#\n### SQL input: %s", result, pType.getDescription(), ext, dataSourceType,
+                properties, prompt) : String.format("%s### 请根据以下SQL input%s. %s\n#\n### SQL input: %s", result,
+                pType.getDescription(), ext, prompt);
+        switch (pType) {
+            case SQL_2_SQL:
+                schemaProperty = StringUtils.isNotBlank(queryRequest.getDestSqlType()) ? String.format(
+                        "%s\n#\n### 目标SQL类型: %s", schemaProperty, queryRequest.getDestSqlType()) : String.format(
+                        "%s\n#\n### 目标SQL类型: %s", schemaProperty, dataSourceType);
+            default:
+                break;
+        }
+        //if (I18nUtils.isEn()) {
+        //    schemaProperty = String.format("%s\n#\n### 返回结果要求为英文", schemaProperty);
+        //}
+        return schemaProperty;
+    }
+
+    private String buildPromptV3(ChatQueryRequest queryRequest) {
+        // 查询schema信息
+        DataResult<DataSource> dataResult = dataSourceService.queryById(queryRequest.getDataSourceId());
+        String dataSourceType = dataResult.getData().getType();
+        if (StringUtils.isBlank(dataSourceType)) {
+            dataSourceType = "MYSQL";
+        }
+
+        List<String> tableSchemas = new ArrayList<>();
+        if (queryRequest.getTableNames() != null) {
+            for (String tableName : queryRequest.getTableNames()) {
+                ShowCreateTableParam createTableParam = chatConverter.chat2showCreateTable(queryRequest);
+                createTableParam.setTableName(tableName);
+
+                DataResult<String> createTableDdl = tableService.showCreateTable(createTableParam);
+                tableSchemas.add(createTableDdl.getData());
+            }
+        }
+        String properties = String.join("\n\n", tableSchemas);
+
+        // 用户问题 prompt
+        String prompt = queryRequest.getMessage();
+        String promptType = StringUtils.isBlank(queryRequest.getPromptType()) ? PromptType.NL_2_SQL.getCode()
+                : queryRequest.getPromptType();
+        PromptType pType = EasyEnumUtils.getEnum(PromptType.class, promptType);
+
+        // 其它扩展内容 prompt
+        String ext = StringUtils.isNotBlank(queryRequest.getExt()) ? queryRequest.getExt() : "无";
+
+        // prompt template
+        String schemaProperty = "";
+        if (CollectionUtils.isNotEmpty(tableSchemas)) {
+            schemaProperty = String.format(
+                    "根据以下 table properties 和 Question, %s. 备注: %s.\n" +
+                            "%s SQL tables, with their properties:\n\n" +
+                            "%s\n\n\n" +
+                            "Question: %s", pType.getDescription(), ext, dataSourceType, properties, prompt
+            );
+        } else {
+            schemaProperty = String.format(
+                    "根据以下 Question, %s. 备注: %s.\n" +
+                            "Question: %s", pType.getDescription(), ext, prompt
+                    );
+        }
+
+        switch (pType) {
+            case SQL_2_SQL:
+                schemaProperty = StringUtils.isNotBlank(queryRequest.getDestSqlType()) ? String.format(
+                        "%s\n#\n### 目标SQL类型: %s", schemaProperty, queryRequest.getDestSqlType()) : String.format(
+                        "%s\n#\n### 目标SQL类型: %s", schemaProperty, dataSourceType);
+            default:
+                break;
+        }
+
         return schemaProperty;
     }
 }

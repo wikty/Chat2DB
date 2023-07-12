@@ -2,6 +2,7 @@ package ai.chat2db.server.web.api.controller.ai.converter;
 
 import ai.chat2db.server.domain.api.param.TableQueryParam;
 import ai.chat2db.server.web.api.controller.ai.request.ChatQueryRequest;
+import ai.chat2db.server.domain.api.param.ShowCreateTableParam;
 
 import org.mapstruct.Mapper;
 
@@ -20,4 +21,6 @@ public abstract class ChatConverter {
      * @return
      */
     public abstract TableQueryParam chat2tableQuery(ChatQueryRequest request);
+
+    public abstract ShowCreateTableParam chat2showCreateTable(ChatQueryRequest request);
 }
