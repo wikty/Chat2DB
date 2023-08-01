@@ -645,6 +645,8 @@ public class ChatController {
             dataSourceType = "MYSQL";
         }
 
+        String databaseName = queryRequest.getDatabaseName();
+
         List<String> tableSchemas = new ArrayList<>();
         if (queryRequest.getTableNames() != null) {
             for (String tableName : queryRequest.getTableNames()) {
@@ -662,33 +664,30 @@ public class ChatController {
         String promptType = StringUtils.isBlank(queryRequest.getPromptType()) ? PromptType.NL_2_SQL.getCode()
                 : queryRequest.getPromptType();
         PromptType pType = EasyEnumUtils.getEnum(PromptType.class, promptType);
-
         // 其它扩展内容 prompt
         String ext = StringUtils.isNotBlank(queryRequest.getExt()) ? queryRequest.getExt() : "无";
 
         // prompt template
         String schemaProperty = "";
-        if (CollectionUtils.isNotEmpty(tableSchemas)) {
-            schemaProperty = String.format(
-                    "根据以下 table properties 和 Question, %s. 备注: %s.\n" +
-                            "%s SQL tables, with their properties:\n\n" +
-                            "%s\n\n\n" +
-                            "Question: %s", pType.getDescription(), ext, dataSourceType, properties, prompt
-            );
+        if (pType == PromptType.SQL_2_SQL) {
+            schemaProperty = StringUtils.isNotBlank(queryRequest.getDestSqlType()) ? String.format(
+                    "%s\n#\n### 目标SQL类型: %s", schemaProperty, queryRequest.getDestSqlType()) : String.format(
+                    "%s\n#\n### 目标SQL类型: %s", schemaProperty, dataSourceType);
         } else {
-            schemaProperty = String.format(
-                    "根据以下 Question, %s. 备注: %s.\n" +
-                            "Question: %s", pType.getDescription(), ext, prompt
-                    );
-        }
-
-        switch (pType) {
-            case SQL_2_SQL:
-                schemaProperty = StringUtils.isNotBlank(queryRequest.getDestSqlType()) ? String.format(
-                        "%s\n#\n### 目标SQL类型: %s", schemaProperty, queryRequest.getDestSqlType()) : String.format(
-                        "%s\n#\n### 目标SQL类型: %s", schemaProperty, dataSourceType);
-            default:
-                break;
+            if (CollectionUtils.isNotEmpty(tableSchemas)) {
+                schemaProperty = String.format(
+                        "根据以下 table properties 和 Question, %s. 备注: %s. version: v3\n" +
+                                "%s SQL database: %s, with their properties:\n\n" +
+                                "%s\n\n\n" +
+                                "Question: %s", pType.getDescription(), ext, dataSourceType, databaseName, properties, prompt
+                );
+            } else {
+                schemaProperty = String.format(
+                        "根据以下 table properties 和 Question, %s. 备注: %s. version: v3\n" +
+                                "%s SQL database: %s, without properties.\n\n\n" +
+                                "Question: %s", pType.getDescription(), ext, dataSourceType, databaseName, prompt
+                );
+            }
         }
 
         return schemaProperty;
