@@ -31,6 +31,15 @@ function ChatInput(props: IProps) {
     props.onPressEnter && props.onPressEnter(e.target.value);
   };
 
+  const onCheckAllTables = (e: any) => {
+    const { tables } = props;
+    if (e.target.checked) {
+      onSelectTables(tables);
+    } else {
+      onSelectTables([]);
+    }
+  };
+
   const renderSelectTable = () => {
     const { tables, selectedTables, onSelectTables } = props;
     const options = (tables || []).map((t) => ({ value: t, label: t }));
@@ -40,9 +49,11 @@ function ChatInput(props: IProps) {
           {/* <WarningOutlined style={{color: 'yellow'}}/> */}
           {i18n('chat.input.remain.tooltip')}
         </span>
+        <Checkbox defaultChecked={true} onChange={onCheckAllTables}>Check all</Checkbox>
         <Select
           showSearch
           mode="multiple"
+          size="large"
           allowClear
           options={options}
           placeholder={i18n('chat.input.tableSelect.placeholder')}
@@ -60,18 +71,19 @@ function ChatInput(props: IProps) {
     return (
       <div className={styles.suffixBlock}>
         <div className={styles.tableSelectBlock}>
-          <Popover content={renderSelectTable()} placement="bottom">
+          <Popover content={renderSelectTable()} placement="bottom" trigger="click">
             <Iconfont code="&#xe618;" />
           </Popover>
         </div>
-        <div
+
+        {/*<div
           className={styles.remainBlock}
           onClick={() => {
             props.onClickRemainBtn && props.onClickRemainBtn();
           }}
         >
           {i18n('chat.input.remain', remainCnt)}
-        </div>
+        </div>*/}
       </div>
     );
   };

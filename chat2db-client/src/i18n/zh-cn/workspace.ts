@@ -1,6 +1,6 @@
 export default {
   'workspace.cascader.placeholder': '请选择',
-  'workspace.ai.input.placeholder': '在这里输入纯文本语句',
+  'workspace.ai.input.placeholder': '用文字描述您想要进行的查询',
   'workspace.title.saved': '保存记录',
   'workspace.menu.exportDDL': '导出DDL',
   'workspace.menu.deleteTable': '删除表',

@@ -161,7 +161,9 @@ function Console(props: IProps) {
     const tableList = (props.tables || []).map((t) => t.name);
 
     // 默认选中前八个
-    setSelectedTables(tableList.slice(0, 8));
+    //setSelectedTables(tableList.slice(0, 8));
+    // 默认全部选中
+    setSelectedTables(tableList);
 
     return tableList;
   }, [props.tables]);
@@ -205,6 +207,7 @@ function Console(props: IProps) {
     }
   };
 
+  // 处理NL2SQL，准备参数、发起请求、显示响应内容
   const handleAiChat = async (content: string, promptType: IPromptType) => {
     const { key } = aiModel?.keyAndAiType;
     if (!key) {
@@ -399,11 +402,12 @@ function Console(props: IProps) {
             onPressEnter={onPressChatInput}
             selectedTables={selectedTables}
             onSelectTables={(tables: string[]) => {
+              {/* 选择多于8张表则报警提示用户 */}
               if (tables.length > 8) {
                 message.warning({
                   content: i18n('chat.input.tableSelect.error.TooManyTable'),
                 });
-                return;
+                //return;
               }
               setSelectedTables(tables);
             }}
