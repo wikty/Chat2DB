@@ -99,7 +99,8 @@ public class ChatController {
     /**
      * 提示语最大token数
      */
-    private Integer MAX_PROMPT_LENGTH = 3850;
+    //private Integer MAX_PROMPT_LENGTH = 3850;
+    private Integer MAX_PROMPT_LENGTH = 3850000;
 
     /**
      * token转换字符串长度
@@ -295,6 +296,8 @@ public class ChatController {
     private SseEmitter chatWithOpenAiSql(ChatQueryRequest queryRequest, SseEmitter sseEmitter, String uid)
         throws IOException {
         String prompt = buildPrompt(queryRequest, promptVersion);
+
+        // MAX_PROMPT_LENGTH 设置为超大值，不在此处限制 prompt 长度 
         if (prompt.length() / TOKEN_CONVERT_CHAR_LENGTH > MAX_PROMPT_LENGTH) {
             log.error("提示语超出最大长度:{}，输入长度:{}, 请重新输入", MAX_PROMPT_LENGTH,
                 prompt.length() / TOKEN_CONVERT_CHAR_LENGTH);

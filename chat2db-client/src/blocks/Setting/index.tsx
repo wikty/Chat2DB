@@ -61,7 +61,7 @@ function Setting(props: IProps) {
       setChatGPTConfig({
         ...res,
         restAiStream: res.restAiStream || true,
-        aiSqlSource: res.aiSqlSource || AiSqlSourceType.CHAT2DBAI,
+        aiSqlSource: res.aiSqlSource || AiSqlSourceType.OPENAI,
       });
     });
   };
@@ -87,12 +87,12 @@ function Setting(props: IProps) {
       type: 'ai/setKeyAndAiType',
       payload,
     });
-    dispatch({
+    /*dispatch({
       type: 'ai/fetchRemainingUse',
       payload: {
         key: payload.key,
       },
-    });
+    });*/
   };
   const menusList = [
     {
@@ -105,11 +105,11 @@ function Setting(props: IProps) {
       icon: '\ue646',
       body: <AISetting chatGPTConfig={chatGPTConfig} handleUpdateAiConfig={handleUpdateAiConfig} />,
     },
-    {
+    /*{
       label: i18n('setting.nav.proxy'),
       icon: '\ue63f',
       body: <ProxySetting />,
-    },
+    },*/
     {
       label: i18n('setting.nav.aboutUs'),
       icon: '\ue60c',

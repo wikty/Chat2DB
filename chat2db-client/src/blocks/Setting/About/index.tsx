@@ -11,7 +11,7 @@ export default function AboutUs() {
     <div className={styles.aboutUs}>
       <BrandLogo size={60} className={styles.brandLogo} />
       <div className={styles.brief}>
-        <div className={styles.appName}>{APP_NAME}</div>
+        <div className={styles.appName}>{APP_NAME}<sup><small>forked by DMeta</small></sup></div>
         <div className={styles.env}>
           {i18n('setting.text.currentEnv')}:{__ENV__}
         </div>
@@ -19,9 +19,12 @@ export default function AboutUs() {
           {i18n('setting.text.currentVersion')}:v{__APP_VERSION__} build
           {formatDate(getUserTimezoneTimestamp(__BUILD_TIME__), 'yyyyMMddhhmmss')}
         </div>
-        <a target="blank" href={GITHUB_URL} className={styles.log}>
+        {/*<a target="blank" href={GITHUB_URL} className={styles.log}>
           {i18n('setting.text.viewingUpdateLogs')}
-        </a>
+        </a>*/}
+        <div className={styles.introduction}>
+          {i18n('setting.text.introduction')}
+        </div>
       </div>
     </div>
   );

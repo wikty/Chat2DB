@@ -29,7 +29,9 @@ export default memo<IProps>(function TestVersion(props) {
           localStorage.setItem('app-gateway-params', JSON.stringify(res))
           const time = new Date().getTime() + 2 * 60 * 60 * 1000;
           localStorage.setItem('update-hint-time', time.toString())
-          openNotification(res);
+          // COMMENT: Update reminder
+          // openNotification(res);
+          console.log(res);
         })
       }
     }

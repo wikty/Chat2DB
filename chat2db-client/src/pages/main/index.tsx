@@ -17,6 +17,13 @@ import styles from './index.less';
 
 const navConfig: INavItem[] = [
   {
+    key: 'connections',
+    icon: '\ue622',
+    iconFontSize: 20,
+    isLoad: false,
+    component: <Connection />,
+  },
+  {
     key: 'workspace',
     icon: '\ue616',
     iconFontSize: 16,
@@ -30,20 +37,13 @@ const navConfig: INavItem[] = [
     isLoad: false,
     component: <Dashboard />,
   },
-  {
-    key: 'connections',
-    icon: '\ue622',
-    iconFontSize: 20,
-    isLoad: false,
-    component: <Connection />,
-  },
-  {
+  /*{
     key: 'github',
     icon: '\ue885',
     iconFontSize: 26,
     isLoad: false,
     openBrowser: 'https://github.com/chat2db/Chat2DB/',
-  },
+  },*/
 ];
 
 const initPageIndex = navConfig.findIndex((t) => `${t.key}` === localStorage.getItem('curPage'));

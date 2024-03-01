@@ -32,7 +32,7 @@ function ChatInput(props: IProps) {
   };
 
   const onCheckAllTables = (e: any) => {
-    const { tables } = props;
+    const { tables, onSelectTables } = props;
     if (e.target.checked) {
       onSelectTables(tables);
     } else {
@@ -70,20 +70,23 @@ function ChatInput(props: IProps) {
     const remainCnt = props?.remainingUse?.remainingUses ?? '-';
     return (
       <div className={styles.suffixBlock}>
+        {/* show selected tables */}
         <div className={styles.tableSelectBlock}>
           <Popover content={renderSelectTable()} placement="bottom" trigger="click">
             <Iconfont code="&#xe618;" />
           </Popover>
         </div>
 
-        {/*<div
+        {/*
+        <div
           className={styles.remainBlock}
           onClick={() => {
             props.onClickRemainBtn && props.onClickRemainBtn();
           }}
         >
           {i18n('chat.input.remain', remainCnt)}
-        </div>*/}
+        </div>
+        */}
       </div>
     );
   };

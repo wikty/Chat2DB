@@ -56,10 +56,12 @@ export default function SettingAI(props: IProps) {
           }}
           value={chatGPTConfig?.aiSqlSource}
         >
+          <Radio value={AiSqlSourceType.OPENAI}>{i18n('setting.tab.ours')}</Radio>
           <Radio value={AiSqlSourceType.CHAT2DBAI}>Chat2DB AI</Radio>
-          <Radio value={AiSqlSourceType.OPENAI}>Open AI</Radio>
+          {/*
           <Radio value={AiSqlSourceType.AZUREAI}>Azure AI</Radio>
           <Radio value={AiSqlSourceType.RESTAI}>{i18n('setting.tab.custom')}</Radio>
+          */}
         </Radio.Group>
       </div>
       {chatGPTConfig?.aiSqlSource === AiSqlSourceType.CHAT2DBAI && (

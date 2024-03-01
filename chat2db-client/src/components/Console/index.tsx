@@ -196,12 +196,12 @@ function Console(props: IProps) {
               aiType: AiSqlSourceType.CHAT2DBAI,
             },
           });
-          await dispatch({
+          /*await dispatch({
             type: 'ai/fetchRemainingUse',
             payload: {
               key: apiKey,
             },
-          });
+          });*/
         }
       }, 3000);
     }
@@ -240,12 +240,12 @@ function Console(props: IProps) {
         if (isEOF) {
           closeEventSource();
           setIsLoading(false);
-          dispatch({
+          /*dispatch({
             type: 'ai/fetchRemainingUse',
             payload: {
               key,
             },
-          });
+          });*/
           if (isNL2SQL) {
             editorRef?.current?.setValue('\n\n\n');
           } else {
@@ -280,12 +280,12 @@ function Console(props: IProps) {
           setIsLoading(false);
           hasErrorToLogin && handleApiKeyEmptyOrGetQrCode(true);
           hasErrorToInvite && handleClickRemainBtn();
-          dispatch({
+          /*dispatch({
             type: 'ai/fetchRemainingUse',
             payload: {
               key,
             },
-          });
+          });*/
           return;
         }
 

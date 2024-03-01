@@ -5,6 +5,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unfbx.chatgpt.entity.common.Usage;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ import lombok.Data;
  * @version : ChatCompletionResponse.java
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatCompletionResponse implements Serializable {
     @Serial
     private static final long serialVersionUID = 4968922211204353592L;
