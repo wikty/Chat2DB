@@ -47,7 +47,7 @@ const navConfig: INavItem[] = [
 ];
 
 const initPageIndex = navConfig.findIndex((t) => `${t.key}` === localStorage.getItem('curPage'));
-const activeIndex = initPageIndex > -1 ? initPageIndex : 2;
+const activeIndex = initPageIndex > -1 ? initPageIndex : 0;
 navConfig[activeIndex].isLoad = true;
 
 interface IProps {

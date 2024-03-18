@@ -1,5 +1,5 @@
 INSERT INTO DATA_SOURCE (GMT_CREATE, GMT_MODIFIED, ALIAS, URL, USER_NAME, PASSWORD, TYPE, USER_ID, HOST, PORT, SSH,JDBC)
-VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Flight DB', 'jdbc:mysql://sql6.freemysqlhosting.net:3306/sql6687312', 'sql6687312', 'HG7hxwXp7E', 'MYSQL', 0, 'sql6.freemysqlhosting.net', '3306', '{"use":false}', '8.0');
+VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Flight DB', 'jdbc:mysql://sql6.freemysqlhosting.net:3306/sql6691462', 'sql6691462', 'YqnEwPb2mp', 'MYSQL', 0, 'sql6.freemysqlhosting.net', '3306', '{"use":false}', '8.0');
 
 INSERT INTO DASHBOARD (ID, GMT_CREATE, GMT_MODIFIED, NAME, DESCRIPTION, SCHEMA, DELETED, USER_ID)
 VALUES (1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '数据分析样例', '数据分析样例', '[[1],[2],[3]]', 'N', 0);

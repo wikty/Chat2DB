@@ -20,7 +20,7 @@ export const databaseMap: {
     // port: 3306,
     icon: '\uec6d',
   },
-  [DatabaseTypeCode.H2]: {
+  /*[DatabaseTypeCode.H2]: {
     name: 'H2',
     img: h2Logo,
     code: DatabaseTypeCode.H2,
@@ -34,6 +34,7 @@ export const databaseMap: {
     // port: 1521,
     icon: '\uec48',
   },
+  */
   [DatabaseTypeCode.POSTGRESQL]: {
     name: 'PostgreSql',
     img: moreDBLogo,
@@ -41,6 +42,7 @@ export const databaseMap: {
     // port: 5432,
     icon: '\uec5d',
   },
+  /*
   [DatabaseTypeCode.SQLSERVER]: {
     name: 'SQLServer',
     img: moreDBLogo,
@@ -55,6 +57,7 @@ export const databaseMap: {
     // port: 5432,
     icon: '\ue65a',
   },
+  */
   [DatabaseTypeCode.MARIADB]: {
     name: 'Mariadb',
     img: moreDBLogo,
@@ -62,6 +65,7 @@ export const databaseMap: {
     // port: 3306,
     icon: '\ue6f5',
   },
+  /*
   [DatabaseTypeCode.CLICKHOUSE]: {
     name: 'ClickHouse',
     img: moreDBLogo,
@@ -132,6 +136,7 @@ export const databaseMap: {
     // port: 6379,
     icon: '\ue6a2',
   },
+  */
 };
 
 export const databaseTypeList = Object.keys(databaseMap).map((keys) => {
