@@ -50,6 +50,7 @@ export const databaseMap: {
     // port: 1521,
     icon: '\ue664',
   },
+  */
   [DatabaseTypeCode.SQLITE]: {
     name: 'SQLite',
     img: moreDBLogo,
@@ -57,7 +58,6 @@ export const databaseMap: {
     // port: 5432,
     icon: '\ue65a',
   },
-  */
   [DatabaseTypeCode.MARIADB]: {
     name: 'Mariadb',
     img: moreDBLogo,
@@ -108,6 +108,7 @@ export const databaseMap: {
     // port: 6379,
     icon: '\ue6a2',
   },
+  */
   [DatabaseTypeCode.HIVE]: {
     name: 'Hive',
     img: moreDBLogo,
@@ -115,6 +116,7 @@ export const databaseMap: {
     // port: 10000,
     icon: '\ue60e',
   },
+  /*
   [DatabaseTypeCode.KINGBASE]: {
     name: 'KingBase',
     img: moreDBLogo,
