@@ -223,14 +223,14 @@ function Console(props: IProps) {
       setIsAiDrawerOpen(true);
       setIsAiDrawerLoading(true);
     }
-    const params = formatParams({
+    const params = {
       message: content,
       promptType,
       dataSourceId,
       databaseName,
       schemaName,
       tableNames: selectedTables,
-    });
+    };
 
     const handleMessage = (message: string) => {
       setIsLoading(false);
@@ -304,11 +304,21 @@ function Console(props: IProps) {
       setIsLoading(false);
     };
 
+    // Maybe http error: 414 request-uri too large
+    //const closeEventSource = connectToEventSource({
+    //  url: `/api/ai/chat?${formatParams(params)}`,
+    //  uid,
+    //  onMessage: handleMessage,
+    //  onError: handleError,
+    //});
+
     const closeEventSource = connectToEventSource({
-      url: `/api/ai/chat?${params}`,
+      url: `/api/ai/chat`,
       uid,
       onMessage: handleMessage,
       onError: handleError,
+      method: "POST",
+      payload: params,
     });
   };
 

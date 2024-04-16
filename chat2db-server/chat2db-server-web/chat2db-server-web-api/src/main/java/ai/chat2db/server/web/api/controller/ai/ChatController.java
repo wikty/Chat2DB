@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.lang.Math;
 
 import ai.chat2db.server.domain.api.enums.AiSqlSourceEnum;
 import ai.chat2db.server.domain.api.model.Config;
@@ -191,7 +192,7 @@ public class ChatController {
     }
 
     /**
-     * SQL转换模型
+     * SQL转换模型 - GET
      *
      * @param queryRequest
      * @param headers
@@ -200,7 +201,7 @@ public class ChatController {
      */
     @GetMapping("/chat")
     @CrossOrigin
-    public SseEmitter completions(ChatQueryRequest queryRequest, @RequestHeader Map<String, String> headers)
+    public SseEmitter handleGetCompletions(ChatQueryRequest queryRequest, @RequestHeader Map<String, String> headers)
         throws IOException {
         //默认30秒超时,设置为0L则永不超时
         SseEmitter sseEmitter = new SseEmitter(CHAT_TIMEOUT);
@@ -213,6 +214,41 @@ public class ChatController {
         if (StringUtils.isBlank(queryRequest.getMessage())) {
             throw new ParamBusinessException("message");
         }
+
+        String tables = String.join(", ", 
+            queryRequest.getTableNames().subList(0, Math.min(10, queryRequest.getTableNames().size())));
+        log.info("Task: " + queryRequest.getPromptType() + "| Message: " + queryRequest.getMessage() + "| DataSource: " + String.valueOf(queryRequest.getDataSourceId()) + "| Tables[" + String.valueOf(queryRequest.getTableNames().size()) + "]: " + tables);
+
+        return distributeAISql(queryRequest, sseEmitter, uid);
+    }
+
+    /**
+     * SQL转换模型 - POST
+     *
+     * @param payloadRequest
+     * @param headers
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("/chat")
+    @CrossOrigin
+    public SseEmitter handlePostCompletions(@RequestBody ChatQueryRequest queryRequest, @RequestHeader Map<String, String> headers)
+        throws IOException {
+        //默认30秒超时,设置为0L则永不超时
+        SseEmitter sseEmitter = new SseEmitter(CHAT_TIMEOUT);
+        String uid = headers.get("uid");
+        if (StrUtil.isBlank(uid)) {
+            throw new ParamBusinessException("uid");
+        }
+
+        //提示消息不得为空
+        if (StringUtils.isBlank(queryRequest.getMessage())) {
+            throw new ParamBusinessException("message");
+        }
+
+        String tables = String.join(", ", 
+            queryRequest.getTableNames().subList(0, Math.min(10, queryRequest.getTableNames().size())));
+        log.info("Task: " + queryRequest.getPromptType() + "| Message: " + queryRequest.getMessage() + "| DataSource: " + String.valueOf(queryRequest.getDataSourceId()) + "| Tables[" + String.valueOf(queryRequest.getTableNames().size()) + "]: " + tables);
 
         return distributeAISql(queryRequest, sseEmitter, uid);
     }
